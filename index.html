@@ -2,16 +2,83 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<style src = "style.css" type="text/css" ></style>
+	<link href = "style.css" rel="stylesheet" >
 	<title>Document</title>
 </head>
 <body>
+	<h1>Tick Tac</h1>
 	<div id = "container">
 		<div id = "gameboard">
-		
+			<div class="cell-row">
+				<div class="cell"></div>	
+				<div class="cell"></div>	
+				<div class="cell"></div>	
+			</div>
+			<div class="cell-row">
+				<div class="cell"></div>	
+				<div class="cell"></div>	
+				<div class="cell"></div>	
+			</div>
+			<div class="cell-row">
+				<div class="cell"></div>	
+				<div class="cell"></div>	
+				<div class="cell"></div>	
+			</div>
 		</div>		
 	</div>
 	
 	<script src = "index.js" type="text/javascript"></script>
+	<script type="text/javascript">
+		window.addEventListener("load", function(){
+			console.log("load, start");
+			
+		})
+
+		let start = GameControl.init();
+	
+		let cell = document.querySelectorAll('#gameboard .cell');
+		for(let i = 0; i< cell.length; i++){
+			cell[i].addEventListener('click', function(e){	
+			e.preventDefault();
+
+			if(GameControl.turn == true) {
+				if(cell[i].innerText == ''){
+					cell[i].innerText = start.player1.getMarker();
+					start.gameboard.setBoard(i, start.player1.getMarker());
+
+					//turn over
+					GameControl.turn = !GameControl.turn;	//invert the boolean
+				}
+				else{
+					console.log('spot taken');
+				}
+
+			}
+			else{
+				if(cell[i].innerText == ''){
+					cell[i].innerText = start.player2.getMarker();
+					start.gameboard.setBoard(i, start.player2.getMarker());
+
+					//turn over
+					GameControl.turn = !GameControl.turn;	//invert the boolean
+				}
+				else{
+					console.log('spot taken');
+				}
+				
+			}
+
+			
+			
+			//when user click on the cell,
+			//first check who's turn,
+			//if turn is = player 1, then x, else o
+
+			console.log('onclick: cell# '+i+ " cellval " + start.gameboard.getBoard()[i]);
+			
+			//displayController();
+			}, false);
+		}
+	</script>
 </body>
 </html>
