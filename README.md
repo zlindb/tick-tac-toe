@@ -1,2 +1,2 @@
 # tick-tac-toe
-learning js
+learning js factory pattern, IIFE Module pattern, object literal IIFE pattern
