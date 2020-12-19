@@ -35,44 +35,43 @@
 		})
 
 		let start = GameControl.init();
-	
+
 		let cell = document.querySelectorAll('#gameboard .cell');
 		for(let i = 0; i< cell.length; i++){
-			cell[i].addEventListener('click', function(e){	
-			e.preventDefault();
+			cell[i].addEventListener('click', function rm(e){	
+				e.preventDefault();
 
-			if(GameControl.turn == true) {
-				if(cell[i].innerText == ''){
-					cell[i].innerText = start.player1.getMarker();
-					start.gameboard.setBoard(i, start.player1.getMarker());
+				if(GameControl.turn == true) {
+					if(this.innerText == ''){
+						this.innerText = start.player1.getMarker();
+						start.gameboard.setBoard(i, start.player1.getMarker());
 
-					//turn over
-					GameControl.turn = !GameControl.turn;	//invert the boolean
+						if(GameControl.gameover(start.gameboard.getBoard()) === true){
+							console.log('p1 won!');
+						}	
+						//turn over
+						GameControl.turn = !GameControl.turn;	//invert the boolean
+						//remove the listener
+						this.removeEventListener(e.type,rm, false);
+
+						
+					}
 				}
 				else{
-					console.log('spot taken');
-				}
+					if(this.innerText == ''){
+						this.innerText = start.player2.getMarker();
+						start.gameboard.setBoard(i, start.player2.getMarker());
 
-			}
-			else{
-				if(cell[i].innerText == ''){
-					cell[i].innerText = start.player2.getMarker();
-					start.gameboard.setBoard(i, start.player2.getMarker());
+						if(GameControl.gameover(start.gameboard.getBoard())=== true){
+							console.log('p2 won !');
+						}
 
-					//turn over
-					GameControl.turn = !GameControl.turn;	//invert the boolean
-				}
-				else{
-					console.log('spot taken');
-				}
-				
-			}
-
-			
-			
-			//when user click on the cell,
-			//first check who's turn,
-			//if turn is = player 1, then x, else o
+						//turn over
+						GameControl.turn = !GameControl.turn;	//invert the boolean
+						//remove the listener
+						this.removeEventListener(e.type,rm, false)	
+					}
+				}			
 
 			console.log('onclick: cell# '+i+ " cellval " + start.gameboard.getBoard()[i]);
 			

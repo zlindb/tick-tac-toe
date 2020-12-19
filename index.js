@@ -1,18 +1,16 @@
 //factory function
 const Player = (name, marker) =>{
-	
 	const getName = () => name;		//getter
 	const getMarker = () => marker;	//getter
-	
 	//shorthand
 	return { getName, getMarker };
 }
 
 const Gameboard = () =>{
-	let gameboard = [
-		'','','',
-		'','','',
-		'','',''
+	const gameboard = [
+	'','','',
+	'','','',
+	'','',''
 	];
 
 	const getBoard = () => gameboard;
@@ -26,18 +24,18 @@ const Gameboard = () =>{
 			gameboard[pos] = val.toUpperCase();		
 
 		}
-		return;
 			
 	}
 	const clearBoard = () =>{
 		gameboard.length = 0;
 		return;
 	}
+
 	return { getBoard, setBoard, clearBoard };
 }
 
-function displayController(selector, msg){
-	document.querySelector(selector).innerHTML = msg;
+function displayController(event){
+	//document.querySelector(selector).innerHTML = msg;
 	//functions for addEventListener
 	//check which player
 	//display mark in cell X or O on click
@@ -51,13 +49,13 @@ const GameControl = (()=>{
 		//creating the players
 		let player1 = Player('player1', 'X');
 		let player2 = Player('player2', 'O');
-		log("created two players");
+		console.log("created two players");
 
 		//create the board
 		let gameboard = Gameboard();
-		log("init board");
+		console.log("init board");
 
-		return {player1, player2, gameboard}
+		return {player1, player2, gameboard }
 	}
 
 	const gamestart = () =>{
@@ -69,15 +67,31 @@ const GameControl = (()=>{
 		
 	}
 
-	const log = msg => {
-		console.log(msg);
-	}
+	const gameover = (gameboard) =>{
+		
+		let winner = false;
+		//value are 1 less than actual number pattern
+		let wp = [ 
+			'012', '036', '048',
+			'147', '258', '246',
+			'345', '678'
+		];
+		
+		//winning_pattern.forEach(function(e){
+		for(let i = 0; i< wp.length; i++){
+			//gameboard.getBoard(); //get all the board value
+			//check for winning condition
+			//e.toString()[0]
+			let e = wp[i];
+			let win = gameboard[e[0]] + gameboard[e[1]] +gameboard[e[2]];
 
-	const gameover = () =>{
-		let gamestate = false;
-
-		//if no winner is decide continue the game
-		return gamestate;
+			if(win === 'XXX' || win === 'OOO'){
+				winner = true;
+				break;
+			}
+		}
+		
+		return winner;
 	}
 	//game over
 	//restart
