@@ -7,11 +7,8 @@ const Player = (name, marker) =>{
 }
 
 const Gameboard = () =>{
-	const gameboard = [
-	'','','',
-	'','','',
-	'','',''
-	];
+	//const gameboard = [	'','','', 	'','','', 	'','',''	];
+	const gameboard = [];
 
 	const getBoard = () => gameboard;
 	const setBoard = (pos, val) =>{
@@ -23,15 +20,14 @@ const Gameboard = () =>{
 		if(val.toUpperCase() === 'X' || val.toUpperCase() === 'O'){
 			gameboard[pos] = val.toUpperCase();		
 
-		}
-			
+		}		
 	}
 	const clearBoard = () =>{
 		gameboard.length = 0;
 		return;
 	}
 
-	return { getBoard, setBoard, clearBoard };
+	return { getBoard, setBoard, clearBoard};
 }
 
 function displayController(event){
@@ -68,7 +64,6 @@ const GameControl = (()=>{
 	}
 
 	const gameover = (gameboard) =>{
-		
 		let winner = false;
 		//value are 1 less than actual number pattern
 		let wp = [ 
@@ -93,8 +88,7 @@ const GameControl = (()=>{
 		
 		return winner;
 	}
-	//game over
-	//restart
+	
 	return { gamestart, gameover, init, turn }
 })();
 

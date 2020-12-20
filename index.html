@@ -8,6 +8,7 @@
 <body>
 	<h1>Tick Tac</h1>
 	<div id = "container">
+		<div id = "status">This is status bar</div>
 		<div id = "gameboard">
 			<div class="cell-row">
 				<div class="cell"></div>	
@@ -37,6 +38,7 @@
 		let start = GameControl.init();
 
 		let cell = document.querySelectorAll('#gameboard .cell');
+
 		for(let i = 0; i< cell.length; i++){
 			cell[i].addEventListener('click', function rm(e){	
 				e.preventDefault();
@@ -48,13 +50,20 @@
 
 						if(GameControl.gameover(start.gameboard.getBoard()) === true){
 							console.log('p1 won!');
+							//winner decide
+							//cleanup
+							//-remove all EventListener from cell 
+							//-stop game from continuing
+							//-remove the player
+							//
+							//update the status bar
+							//
 						}	
 						//turn over
 						GameControl.turn = !GameControl.turn;	//invert the boolean
-						//remove the listener
-						this.removeEventListener(e.type,rm, false);
 
-						
+						//remove the listener
+						this.removeEventListener(e.type,rm, false);				
 					}
 				}
 				else{
@@ -64,6 +73,7 @@
 
 						if(GameControl.gameover(start.gameboard.getBoard())=== true){
 							console.log('p2 won !');
+							break;
 						}
 
 						//turn over
