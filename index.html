@@ -9,85 +9,29 @@
 	<h1>Tick Tac</h1>
 	<div id = "container">
 		<div id = "status">This is status bar</div>
-		<div id = "gameboard">
-			<div class="cell-row">
-				<div class="cell"></div>	
-				<div class="cell"></div>	
-				<div class="cell"></div>	
-			</div>
-			<div class="cell-row">
-				<div class="cell"></div>	
-				<div class="cell"></div>	
-				<div class="cell"></div>	
-			</div>
-			<div class="cell-row">
-				<div class="cell"></div>	
-				<div class="cell"></div>	
-				<div class="cell"></div>	
-			</div>
-		</div>		
+		<div id = "gameboard"></div>		
 	</div>
 	
 	<script src = "index.js" type="text/javascript"></script>
 	<script type="text/javascript">
 		window.addEventListener("load", function(){
-			console.log("load, start");
+			//build the 3x3 grid
 			
+
 		})
-
-		let start = GameControl.init();
-
+		
+		GameControl.init();
+		//let { player1, player2, gameboard} = GameControl.init();
+/*
 		let cell = document.querySelectorAll('#gameboard .cell');
-
 		for(let i = 0; i< cell.length; i++){
 			cell[i].addEventListener('click', function rm(e){	
 				e.preventDefault();
 
-				if(GameControl.turn == true) {
-					if(this.innerText == ''){
-						this.innerText = start.player1.getMarker();
-						start.gameboard.setBoard(i, start.player1.getMarker());
-
-						if(GameControl.gameover(start.gameboard.getBoard()) === true){
-							console.log('p1 won!');
-							//winner decide
-							//cleanup
-							//-remove all EventListener from cell 
-							//-stop game from continuing
-							//-remove the player
-							//
-							//update the status bar
-							//
-						}	
-						//turn over
-						GameControl.turn = !GameControl.turn;	//invert the boolean
-
-						//remove the listener
-						this.removeEventListener(e.type,rm, false);				
-					}
-				}
-				else{
-					if(this.innerText == ''){
-						this.innerText = start.player2.getMarker();
-						start.gameboard.setBoard(i, start.player2.getMarker());
-
-						if(GameControl.gameover(start.gameboard.getBoard())=== true){
-							console.log('p2 won !');
-							break;
-						}
-
-						//turn over
-						GameControl.turn = !GameControl.turn;	//invert the boolean
-						//remove the listener
-						this.removeEventListener(e.type,rm, false)	
-					}
-				}			
-
-			console.log('onclick: cell# '+i+ " cellval " + start.gameboard.getBoard()[i]);
-			
+				
 			//displayController();
 			}, false);
-		}
+		}*/
 	</script>
 </body>
 </html>
