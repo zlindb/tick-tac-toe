@@ -110,7 +110,7 @@ const GameControl = (()=>{
 	//game start
 	const init = ()=>{	
 
-		//check if player is AI
+		//check if first move player is AI
 		if(playerArr[p_loop].getType() === 'ai'){
 			aiMove();
 			nextTurn();	
@@ -150,12 +150,15 @@ const GameControl = (()=>{
 		gameboard.getBoard().forEach((val,index)=>{
 			if(val === '') available.push(index);
 		});
-		let random = Math.floor(Math.random() * available.length);	
-		return available[random];
+		
+		return available;
 	}
 
 	const aiMove = ()=>{
-		let index = availableIndex();
+		
+		let indexArr = availableIndex();
+		let random = Math.floor(Math.random() * indexArr.length);	
+
 		let bestMove;
 		let bestscore = -1000000;
 
@@ -170,8 +173,8 @@ const GameControl = (()=>{
 */
 		//	console.log(bestMove);
 
-			gameboard.setBoard(index, playerArr[p_loop].getMarker());	
-			DisplayController.writeToDom(gamecells[index], playerArr[p_loop].getMarker());
+			gameboard.setBoard(indexArr[random], playerArr[p_loop].getMarker());	
+			DisplayController.writeToDom(gamecells[random], playerArr[p_loop].getMarker());
 
 		//	gameboard.setBoard(bestMove, playerArr[p_loop].getMarker());	
 		//	DisplayController.writeToDom(gamecells[bestMove], playerArr[p_loop].getMarker());
