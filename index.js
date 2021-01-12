@@ -113,7 +113,6 @@ const GameControl = (()=>{
 		//check if first move player is AI
 		if(playerArr[p_loop].getType() === 'ai'){
 			aiMove();
-			nextTurn();	
 		}
 		//attach event listener
 		for(let i = 0; i< gamecells.length; i++){
@@ -125,7 +124,35 @@ const GameControl = (()=>{
 		p_loop = (p_loop+1) % playerArr.length;
 
 		if(playerArr[p_loop].getType() === 'ai'){	//ai turn;
-			aiMove();
+			aiMove();	
+		}		
+	}
+
+	const aiMove = ()=>{
+		
+		let available = [];	
+		gameboard.getBoard().forEach((val,index)=>{
+			if(val === '') available.push(index);
+		});
+		
+		let random = Math.floor(Math.random() * Math.floor(available.length));	
+
+		let bestMove;
+		let bestscore = -1000000;
+
+		//if(gameboard.getBoard(index) === ""){
+		/*	
+			let score = minimax(gameboard.getBoard(), 0, true);
+			console.log(score);
+			if(score > bestscore){
+				bestscore = score;
+				bestMove = index;
+			}
+*/
+		//	console.log(bestMove);
+		
+			gameboard.setBoard(available[random], playerArr[p_loop].getMarker());	
+			DisplayController.writeToDom(gamecells[available[random]], playerArr[p_loop].getMarker());
 
 			if(checkWinner() === 'true'){
 				disable_cell();
@@ -141,45 +168,6 @@ const GameControl = (()=>{
 			else{
 				nextTurn();
 			}
-		}		
-	}
-
-	//get the available spot in gamboard
-	const availableIndex = () =>{
-		let available = [];	
-		gameboard.getBoard().forEach((val,index)=>{
-			if(val === '') available.push(index);
-		});
-		
-		return available;
-	}
-
-	const aiMove = ()=>{
-		
-		let indexArr = availableIndex();
-		let random = Math.floor(Math.random() * indexArr.length);	
-
-		let bestMove;
-		let bestscore = -1000000;
-
-		//if(gameboard.getBoard(index) === ""){
-		/*	
-			let score = minimax(gameboard.getBoard(), 0, true);
-			console.log(score);
-			if(score > bestscore){
-				bestscore = score;
-				bestMove = index;
-			}
-*/
-		//	console.log(bestMove);
-
-			gameboard.setBoard(indexArr[random], playerArr[p_loop].getMarker());	
-			DisplayController.writeToDom(gamecells[random], playerArr[p_loop].getMarker());
-
-		//	gameboard.setBoard(bestMove, playerArr[p_loop].getMarker());	
-		//	DisplayController.writeToDom(gamecells[bestMove], playerArr[p_loop].getMarker());
-		//}
-
 	}
 
 	const eval_func = {
