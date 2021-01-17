@@ -1,24 +1,26 @@
-#container{
-	padding:10px;
+
+.disable-div {
+	pointer-events: none;
 }
-#gameboard{
-	width:500px;
-	height:500px;
-	margin:0 auto;
+
+#status{
 	border:1px solid;
 }
+#p1name, #p2name{
+	text-align:center;
+	border:1px solid;
+	background-color:yellow;
+}
 
-.cell-row{
-	margin:auto;
-	display:flex;
-
+.cellrow{
+	display:flex;	
 }
 .cell{
 	border:1px solid;
-	width:50px;
-	height:50px;
+	font-size:3em;
+	width:75px;
+	height:75px;
 	display:flex;
 	justify-content: center;
 	align-items:center;
-	
 }
