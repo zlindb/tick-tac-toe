@@ -8,7 +8,7 @@ const Player = (name, marker, type) =>{
 	
 		if(getType() === 'ai'){
 			let ran = Math.floor(Math.random() * Math.floor(9)); 	//return # 1-8
-			board.setBoard(ran, getMarker());	
+			board[ran] = getMarker();	
 
 		}
 		else{
@@ -27,23 +27,11 @@ const Gameboard = () =>{
 		'','',''
 	];
 
-	const getBoard = () => gameboard;
-	const setBoard = (pos, marker) =>{
-		if(typeof(marker) !== "string"){
-			console.error("not a string");
-			return;
-		}
-		//check if value is either X or O
-		if(marker.toUpperCase() === 'X' || marker.toUpperCase() === 'O'){
-			gameboard[pos] = marker.toUpperCase();		
-		}			
-	}
+	let availableSpot = ()=>{
+		return gameboard.filter(val=> val ==='');
+	};
 
-	const clearBoard = () =>{
-		gameboard.length = 0;
-	}
-
-	return { getBoard, setBoard, clearBoard };
+	return { gameboard, getAvailableSpot: availableSpot() };
 }
 
 //object literal 
@@ -69,7 +57,12 @@ const DisplayController = ((selector = '#gameboard') => {
 			}
 		},
 		writeToDom: (selector, msg) =>{
-			selector.innerHTML = msg;
+			if(selector)
+				selector.innerText = msg;
+			else{
+				console.error('selector is', selector);
+			}
+
 		}
 	}
 })('#gameboard')
@@ -92,12 +85,12 @@ const GameControl = (()=>{
 
 	//board, players declaration
 	console.log("init board");
-	let	gameboard = Gameboard();
+	let	{ gameboard, getAvailableSpot } = Gameboard();
 
 	console.log("created two players");		
-	let playerArr =[
-			Player(p1name, 'X', 'ai'),
-			Player(p2name, 'O', 'human')
+	let players =[
+			Player(p1name, 'X', 'human'),
+			Player(p2name, 'O', 'ai')
 		];
 
 	let p_loop = 0;
@@ -111,7 +104,7 @@ const GameControl = (()=>{
 	const init = ()=>{	
 
 		//check if first move player is AI
-		if(playerArr[p_loop].getType() === 'ai'){
+		if(players[p_loop].getType() === 'ai'){
 			aiMove();
 		}
 		//attach event listener
@@ -121,128 +114,162 @@ const GameControl = (()=>{
 
 	}
 	const nextTurn = () =>{
-		p_loop = (p_loop+1) % playerArr.length;
+		p_loop = (p_loop+1) % players.length;
 
-		if(playerArr[p_loop].getType() === 'ai'){	//ai turn;
+		if(players[p_loop].getType() === 'ai'){	//ai turn;
 			aiMove();	
 		}		
 	}
 
-	const aiMove = ()=>{
-		
-		let available = [];	
-		gameboard.getBoard().forEach((val,index)=>{
-			if(val === '') available.push(index);
-		});
-		
-		let random = Math.floor(Math.random() * Math.floor(available.length));	
+	const aiMove = ()=>{	
+	
+		let bestScore = 10000;
+		let bestMove = 0;
+	
+		for(let i = 0; i< getAvailableSpot.length;i++){
+			if(gameboard[i] === ""){
 
-		let bestMove;
-		let bestscore = -1000000;
+				gameboard[i] = players[p_loop].getMarker();
+				
+				let score = minimax(0,true);
+				gameboard[i] = '';
 
-		//if(gameboard.getBoard(index) === ""){
-		/*	
-			let score = minimax(gameboard.getBoard(), 0, true);
-			console.log(score);
-			if(score > bestscore){
-				bestscore = score;
-				bestMove = index;
+				if(score < bestScore){
+					bestScore = score;
+					bestMove = i;
+				}
 			}
-*/
-		//	console.log(bestMove);
-		
-			gameboard.setBoard(available[random], playerArr[p_loop].getMarker());	
-			DisplayController.writeToDom(gamecells[available[random]], playerArr[p_loop].getMarker());
+		}
 
-			if(checkWinner() === 'true'){
-				disable_cell();
-				console.log('Winner: ' + playerArr[p_loop].getName());
-				return;
-			}
-			else if(checkWinner() === 'tied'){
-				disable_cell();
-				console.log('tied');
-				return;
-			}
-		
-			else{
-				nextTurn();
-			}
+	//	gameboard.setBoard(available[random], playerArr[p_loop].getMarker());	
+	//	DisplayController.writeToDom(gamecells[available[random]], playerArr[p_loop].getMarker());
+		gameboard[bestMove] = players[p_loop].getMarker();	
+		DisplayController.writeToDom(gamecells[bestMove], players[p_loop].getMarker());
+
+		if(checkWinner() !== null){
+			disable_cell();
+			//console.log('Winner: ' + playerArr[p_loop].getName());
+		//	console.log('Winner: ' + result);
+			return;
+		}
+		else{
+			nextTurn();
+		}
 	}
 
-	const eval_func = {
-		'true': 10,
-		'false': -10,
-		'tied': 0
+	const utility_func = {
+		'O': -1,
+		'X': 1,
+		'tie': 0
 	}
-	//const minimax = (position, depth, isMaxPlayer) =>{
-	const minimax = (board, depth, isMaxPlayer) =>{
+
+	const maximin = (depth, isMinPlayer) =>{
 		let result = checkWinner();
-		if(result !== 'false'){	
-			console.log("result", result);
-			return eval_func[result];
-		}
-		console.log(board);
-		if(isMaxPlayer){
-			let maxScore = -Infinity;
-			for(let i=0; i< board.length; i++){
-				if(board[i] === ""){
-
-					board[i] = playerArr[0].getMarker();
-					let score = minimax(board, depth+1, false);
-					//what does the score return?
-					//what is the value function?
-
-					board.setBoard(i, '');
-
-					maxScore = Math.max(maxScore, score);
-					
-				}
-				
-			}
-			return maxScore;		
-		}
-		else{ //min player
-			let maxScore = Infinity;
-			for(let i=0; i< board.length; i++){
-				if(board[i] === ""){
-
-					board[i] = playerArr[1].getMarker();
-					let score = minimax(board, depth+1, true);
-					board.setBoard(i, '');
-
-					maxScore = Math.min(score, maxScore);
-					
-				}
-				
-			}
+			if(result !== null){	
 			
-			return maxScore;
+				return utility_func[result];
 		}
 
-		return 1;
+		if(isMinPlayer){
+			let maxEval= -10000;
+			for(let i=0; i< gameboard.length; i++){
+
+				if(gameboard[i] === ""){
+					
+					gameboard[i] = players[1].getMarker();					
+					let score = minimax(depth+1, false);
+					console.log(score);
+					gameboard[i] = '';
+					
+					maxEval = Math.max(maxEval, score);
+				}		
+			}
+
+			return maxEval;		
+		}
+	
+	/*else{ //min player
+			let minEval = 10000;
+			for(let i=0; i < gameboard.length; i++){
+				
+				if(gameboard[i] === ""){
+				//	p_loop = (p_loop+1) % players.length;// get the other player
+
+					gameboard[i] = players[0].getMarker();
+
+					let score = minimax(depth+1, true);
+					
+					gameboard[i] = '';	
+					minEval = Math.min(minEval, score);			
+
+				}	
+			}
+			return minEval;
+	*///	}
+		
 	}
 
-	//event Listener for human player
+	//const minimax = (position, depth, isMaxPlayer) =>{
+	const minimax = (depth, isMaxPlayer) =>{
+		let result = checkWinner();
+			if(result !== null){	
+			
+				return utility_func[result];
+		}
+
+		if(isMaxPlayer){
+			let maxEval= -10000;
+			for(let i=0; i< gameboard.length; i++){
+
+				if(gameboard[i] === ""){
+					
+					gameboard[i] = players[0].getMarker();					
+					let score = minimax(depth+1, false);
+
+					gameboard[i] = '';
+					
+					maxEval = Math.max(maxEval, score);
+				}		
+			}
+
+			return maxEval;		
+		}
+	
+		else{ //min player
+			let minEval = 10000;
+			for(let i=0; i < gameboard.length; i++){
+				
+				if(gameboard[i] === ""){
+				//	p_loop = (p_loop+1) % players.length;// get the other player
+
+					gameboard[i] = players[1].getMarker();
+
+					let score = minimax(depth+1, true);
+					
+					gameboard[i] = '';	
+					minEval = Math.min(minEval, score);			
+
+				}	
+			}
+			return minEval;
+		}
+	
+	}
+
+	//event Listener for human playe
 	const eventListener = (e) =>{	
 		if(event.target.innerText === ''){
-
-			gameboard.setBoard(Array.prototype.indexOf.call(gamecells, e.target), playerArr[p_loop].getMarker());
-			DisplayController.writeToDom(e.target, playerArr[p_loop].getMarker());
+			let index = Array.prototype.indexOf.call(gamecells, e.target); 
+			gameboard[index] = players[p_loop].getMarker();
+			DisplayController.writeToDom(e.target, players[p_loop].getMarker());
 		
-			if(checkWinner() === 'true'){
+			if(checkWinner() !== null){
 				disable_cell();
-				console.log("winner ", playerArr[p_loop].getName());
-
-			}
-			else if(checkWinner() === 'tied'){
-				disable_cell();
-				console.log('game tied');
+				console.log("winner ", players[p_loop].getName());
 			}
 			else{
 				nextTurn();
 			}
-			
 		}
 	}
 
@@ -259,7 +286,7 @@ const GameControl = (()=>{
 
 	const checkWinner = () =>{
 	
-		let winner = 'false';
+		let winner = null;
 	
 		//winning scenario
 		let wp = [ '012', '036', '048',	'147', '258', '246','345', '678'];
@@ -273,27 +300,33 @@ const GameControl = (()=>{
 		for(let i = 0; i< wp.length; i++){
 			let e = wp[i];
 
-			let win = gameboard.getBoard()[e[0]] + gameboard.getBoard()[e[1]] +gameboard.getBoard()[e[2]];
+			let win = gameboard[e[0]] + gameboard[e[1]] +gameboard[e[2]];
 
-			if(win === 'XXX' || win === 'OOO'){
-				winner = 'true';	
-			//	console.log("winner is: ", playerArr[p_loop].getName());
+			if(win === 'XXX'){
 
-				return winner;
+				return 'X';
+			}
+			else if(win ==='OOO'){
+				return 'O';
 			}
 			
 		}
+		let avail = gameboard.filter(val =>{
+			return val !== '';
+		});
+	//	console.log(avail);
 		//no winner decided, return tied game
-		if(gameboard.getBoard().filter(function(val){
-			if(!val) return false;
-			return val;
-		}).length === 9 && winner == 'false'){
-			return 'tied';
+		if(avail.length === 9 && winner == null){
+			winner = 'tie';
+			return winner;
 		}
-		return 'false';
+		
+		return winner;
+
 	}
 
-	return { init }
+	return { init , gameboard }
 })();
+
 
 
