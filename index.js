@@ -174,8 +174,8 @@ const GameControl = (()=>{
 	}
 
 	const utility_func = {
-		'O': -1,
-		'X': 1,
+		'O': -10,
+		'X': 10,
 		'tie': 0
 	}
 
@@ -189,7 +189,7 @@ const GameControl = (()=>{
 
 		if(isMaxPlayer){
 			let maxEval= -10000;
-			for(let i=0; i< gameboard.length; i++){
+			for(let i=0; i< getAvailableSpot.length; i++){
 
 				if(gameboard[i] === ""){
 					
@@ -207,7 +207,7 @@ const GameControl = (()=>{
 	
 		else{ //min player
 			let minEval = 10000;
-			for(let i=0; i < gameboard.length; i++){
+			for(let i=0; i < getAvailableSpot.length; i++){
 				
 				if(gameboard[i] === ""){
 				//	p_loop = (p_loop+1) % players.length;// get the other player
@@ -233,9 +233,14 @@ const GameControl = (()=>{
 			gameboard[index] = players[p_loop].getMarker();
 			DisplayController.writeToDom(e.target, players[p_loop].getMarker());
 		
-			if(checkWinner() !== null){
+			let result = checkWinner();
+			if(result==='X' || result ==='O'){
 				disable_cell();
 				console.log("winner ", players[p_loop].getName());
+			}
+			else if(result === 'tie'){
+				disable_cell();
+				console.log("tied");	
 			}
 			else{
 				nextTurn();
@@ -288,6 +293,7 @@ const GameControl = (()=>{
 		//no winner decided, return tied game
 		if(avail.length === 9 && winner == null){
 			winner = 'tie';
+			
 			return winner;
 		}
 		
