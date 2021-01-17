@@ -89,12 +89,12 @@ const GameControl = (()=>{
 
 	console.log("created two players");		
 	let players =[
-			Player(p1name, 'X', 'human'),
-			Player(p2name, 'O', 'ai')
+			Player(p1name, 'X', 'ai'),
+			Player(p2name, 'O', 'human')
 		];
 
 	let p_loop = 0;
-/*
+/*el
 	const updateStatus = (msg) =>{
 		let container = document.querySelector('#status');
 		container.prepend(document.createTextNode(msg))
@@ -117,14 +117,17 @@ const GameControl = (()=>{
 		p_loop = (p_loop+1) % players.length;
 
 		if(players[p_loop].getType() === 'ai'){	//ai turn;
-			aiMove();	
-		}		
+			aiMove(p_loop);	
+
+		}
+
 	}
 
-	const aiMove = ()=>{	
+	//player_num to distinguish between player 1 ai or p2-ai
+	const aiMove = (player_num)=>{	
 	let bestMove, bestScore;	
 
-	if(players[0].getType() === 'ai'){
+	if(player_num === 0){
 		bestScore = -10000;
 		bestMove = 0;
 		for(let i = 0; i< getAvailableSpot.length;i++){
@@ -162,11 +165,14 @@ const GameControl = (()=>{
 		gameboard[bestMove] = players[p_loop].getMarker();	
 		DisplayController.writeToDom(gamecells[bestMove], players[p_loop].getMarker());
 
-		if(checkWinner() !== null){
+		let result = checkWinner();
+		if(result==='X' || result ==='O'){
 			disable_cell();
-			//console.log('Winner: ' + playerArr[p_loop].getName());
-		//	console.log('Winner: ' + result);
-			return;
+			console.log("winner ", players[p_loop].getName());
+		}
+		else if(result === 'tie'){
+			disable_cell();
+			console.log("tied");	
 		}
 		else{
 			nextTurn();
@@ -180,7 +186,7 @@ const GameControl = (()=>{
 	}
 
 	//const minimax = (position, depth, isMaxPlayer) =>{
-	const minimax = (depth, isMaxPlayer) =>{
+	const minimax = (depth, isMaxPlayer, player_num) =>{
 		let result = checkWinner();
 			if(result !== null){	
 			
@@ -210,15 +216,12 @@ const GameControl = (()=>{
 			for(let i=0; i < getAvailableSpot.length; i++){
 				
 				if(gameboard[i] === ""){
-				//	p_loop = (p_loop+1) % players.length;// get the other player
-
 					gameboard[i] = players[1].getMarker();
 
 					let score = minimax(depth+1, true);
 					
 					gameboard[i] = '';	
 					minEval = Math.min(minEval, score);			
-
 				}	
 			}
 			return minEval;
@@ -265,12 +268,6 @@ const GameControl = (()=>{
 	
 		//winning scenario
 		let wp = [ '012', '036', '048',	'147', '258', '246','345', '678'];
-
-		//if there's less 3 marks, skip checks //filter array to ignore empty values
-		// if(gameboard.getBoard().filter(function(val){
-		// 	if(!val) return false;
-		// 	return val;
-		// }).length < 3) return false;
 		
 		for(let i = 0; i< wp.length; i++){
 			let e = wp[i];
@@ -278,10 +275,11 @@ const GameControl = (()=>{
 			let win = gameboard[e[0]] + gameboard[e[1]] +gameboard[e[2]];
 
 			if(win === 'XXX'){
-
+			
 				return 'X';
 			}
 			else if(win ==='OOO'){
+			
 				return 'O';
 			}
 			
@@ -293,7 +291,7 @@ const GameControl = (()=>{
 		//no winner decided, return tied game
 		if(avail.length === 9 && winner == null){
 			winner = 'tie';
-			
+
 			return winner;
 		}
 		
