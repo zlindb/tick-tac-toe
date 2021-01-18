@@ -11,45 +11,77 @@
 <body>
 	<div id = "container">
 		<h1>Tick Tac</h1>
+
 		<div class = "row justify-content-md-center">
-			<div class = "col-auto">
+			<div class = "specs my-1">
 				<label for="player1name">Player 1 Name: </label>
-				<input type="text" id = "player1name" value=""/>
-			</div>
-			<div class = "col-auto">
-				<label for="player2name">Player 2 Name: </label>
-				<input type="text" id = "player2name" value=""/>
-			</div>
-			<div class = "col-auto">
-				<button type = "submit" id="startgame" class = "btn btn-primary">Start</button>
+				<input type="text" id = "player1name" value="" placeholder='player1'/>
+				<button type='button' class='btn btn-secondary active ' name='human'>Human</button>
+				<button type='button' class='btn btn-secondary' name='ai'>AI</button>
 			</div>
 
-		</div>
-		<div class = "row justify-content-md-center">
-			<div id = "status" class = 'col-2'>
-				<p class = 'status-text'></p>
+			<div class = "specs my-1">
+				<label for="player2name">Player 2 Name: </label>
+				<input type="text" id = "player2name" value="" placeholder='player2'/>
+				<button type='button' class='btn btn-secondary' name='human'>Human</button>
+				<button type='button' class='btn btn-secondary active' name='ai'>AI</button>
 			</div>
+		
+			<button type = "submit" id="startgame" class = "btn btn-primary">Begin</button>
+
+		<!--<button type = "submit" id="restart" class = "btn btn-primary">play again?</button>-->
+		
+		</div>
+		<div class = 'container mt-2'>
+		<div class = "row body-wrap mx-auto">
+			<h1 id = "status">Tic Tac Toe </h1>
 			<div id = "board-container"  class = 'col-auto'>
 				<div id = "p1name">player1</div>
 				<div id = "gameboard"></div>
 				<div id = "p2name">player2</div>
 			</div>
 		</div>
+		</div>
 	</div>
 	
 	<script src = "index.js" type="text/javascript"></script>
 	<script type="text/javascript">
-		/*
-		let startgame = document.querySelector('#startgame');
-		startgame.addEventListener('click', function(e){
-			e.preventDefault();
-		//	console.log('click');
-			GameControl.init();
-		});
-		*/
-		GameControl.init();
 		
-		//let { player1, player2, gameboard} = GameControl.init();
+		let specs = document.querySelectorAll('.specs');
+
+		Array.from(specs).forEach(spec =>{
+			let buttons = spec.querySelectorAll('button');
+				buttons.forEach((but, index)=>{
+					but.addEventListener('click', function(e){
+						e.preventDefault();
+
+						//remove all active class from all button
+						for(let b of buttons){
+							b.classList.remove('active');
+						}
+						//add to the one that's clicked
+						this.classList.add('active');
+				}, false);
+			});
+		});
+
+		let startgame = document.getElementById('startgame');
+		let restart = document.getElementById('restart');
+		startgame.addEventListener('click', ()=>{
+			GameControl.init();
+			console.log('Begin');
+			DisplayController.updateStatus('Start Game');
+		});
+
+	//reload
+	/*restart.addEventListener('click', ()=>{
+		console.log('click');
+		window.location = window.location;
+
+	});
+*/
+
+
 /*
 		let cell = document.querySelectorAll('#gameboard .cell');
 		for(let i = 0; i< cell.length; i++){

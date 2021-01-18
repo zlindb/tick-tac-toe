@@ -2,10 +2,18 @@
 .disable-div {
 	pointer-events: none;
 }
+.body-wrap{
+	width: 250px;
+	text-align:center;
+}
 
+.active{
+	background-color: blue !important;
+}
 #status{
 	border:1px solid;
 }
+
 #p1name, #p2name{
 	text-align:center;
 	border:1px solid;

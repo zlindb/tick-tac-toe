@@ -4,20 +4,7 @@ const Player = (name, marker, type) =>{
 	const getMarker = () => marker;	//getter
 	const getType = () => type;
 
-	const move = (board, pos) =>{
-	
-		if(getType() === 'ai'){
-			let ran = Math.floor(Math.random() * Math.floor(9)); 	//return # 1-8
-			board[ran] = getMarker();	
-
-		}
-		else{
-			
-		//	gameboard.setBoard(pos, getMarker());
-		}
-	}
-	
-	return { getName, getMarker, getType, move};
+	return { getName, getMarker, getType};
 }
 
 const Gameboard = () =>{
@@ -63,6 +50,10 @@ const DisplayController = ((selector = '#gameboard') => {
 				console.error('selector is', selector);
 			}
 
+		},
+		updateStatus: (msg)=>{
+			let status = document.getElementById('status');
+			status.innerText = msg;
 		}
 	}
 })('#gameboard')
@@ -77,31 +68,28 @@ const GameControl = (()=>{
 
 	const gamecells = document.querySelectorAll('#gameboard .cell');
 	
-	let p1name = document.getElementById('player1name').value || "player1";
-	let p2name = document.getElementById('player2name').value || "player2";
-
-	DisplayController.writeToDom(document.getElementById('p1name'), p1name);
-	DisplayController.writeToDom(document.getElementById('p2name'), p2name);
-
 	//board, players declaration
 	console.log("init board");
 	let	{ gameboard, getAvailableSpot } = Gameboard();
-
-	console.log("created two players");		
-	let players =[
-			Player(p1name, 'X', 'ai'),
-			Player(p2name, 'O', 'human')
-		];
+	let players =[];
 
 	let p_loop = 0;
-/*el
-	const updateStatus = (msg) =>{
-		let container = document.querySelector('#status');
-		container.prepend(document.createTextNode(msg))
-	}
-*/
+
 	//game start
 	const init = ()=>{	
+
+		let p1name = document.getElementById('player1name').value || "player1";
+		let p2name = document.getElementById('player2name').value || "player2";
+
+		DisplayController.writeToDom(document.getElementById('p1name'), p1name);
+		DisplayController.writeToDom(document.getElementById('p2name'), p2name);
+
+		let getPlayer1Type = document.querySelectorAll(".specs button.active")[0];
+		let getPlayer2Type = document.querySelectorAll(".specs button.active")[1];
+
+		console.log("created two players");		
+		players.push(Player(p1name, 'X', getPlayer1Type.name));
+		players.push(Player(p2name, 'O', getPlayer2Type.name));
 
 		//check if first move player is AI
 		if(players[p_loop].getType() === 'ai'){
@@ -116,49 +104,47 @@ const GameControl = (()=>{
 	const nextTurn = () =>{
 		p_loop = (p_loop+1) % players.length;
 
+		DisplayController.updateStatus(players[p_loop].getName() + '\'s turn');
 		if(players[p_loop].getType() === 'ai'){	//ai turn;
 			aiMove(p_loop);	
-
 		}
 
 	}
 
 	//player_num to distinguish between player 1 ai or p2-ai
 	const aiMove = (player_num)=>{	
-	let bestMove, bestScore;	
+		let bestMove, bestScore;	
 
-	if(player_num === 0){
-		bestScore = -10000;
-		bestMove = 0;
-		for(let i = 0; i< getAvailableSpot.length;i++){
-			if(gameboard[i] === ""){
-				gameboard[i] = players[p_loop].getMarker();
-				let score = minimax(0, false);
-				gameboard[i] = '';
-				if(score > bestScore){
-					bestScore = score;
-					bestMove = i;
+		if(player_num === 0){
+			bestScore = -10000;
+			bestMove = 0;
+			for(let i = 0; i< getAvailableSpot.length;i++){
+				if(gameboard[i] === ""){
+					gameboard[i] = players[p_loop].getMarker();
+					let score = minimax(0, false);
+					gameboard[i] = '';
+					if(score > bestScore){
+						bestScore = score;
+						bestMove = i;
+					}
 				}
-			}
-		}	
-	}
-	else {
-		bestScore = 10000;
-		bestMove = 0;
-		for(let i = 0; i< getAvailableSpot.length;i++){
-			if(gameboard[i] === ""){
-				gameboard[i] = players[p_loop].getMarker();
-				let score = minimax(0, true);
-				gameboard[i] = '';
-				if(score < bestScore){
-					bestScore = score;
-					bestMove = i;
-				}
-			}
+			}	
 		}
-		
-		
-	}
+		else {
+			bestScore = 10000;
+			bestMove = 0;
+			for(let i = 0; i< getAvailableSpot.length;i++){
+				if(gameboard[i] === ""){
+					gameboard[i] = players[p_loop].getMarker();
+					let score = minimax(0, true);
+					gameboard[i] = '';
+					if(score < bestScore){
+						bestScore = score;
+						bestMove = i;
+					}
+				}
+			}	
+		}
 
 	//	gameboard.setBoard(available[random], playerArr[p_loop].getMarker());	
 	//	DisplayController.writeToDom(gamecells[available[random]], playerArr[p_loop].getMarker());
@@ -168,11 +154,12 @@ const GameControl = (()=>{
 		let result = checkWinner();
 		if(result==='X' || result ==='O'){
 			disable_cell();
-			console.log("winner ", players[p_loop].getName());
+			
+			DisplayController.updateStatus('Winner is:', players[p_loop].getName());
 		}
 		else if(result === 'tie'){
 			disable_cell();
-			console.log("tied");	
+			DisplayController.updateStatus('Tie');
 		}
 		else{
 			nextTurn();
@@ -239,11 +226,11 @@ const GameControl = (()=>{
 			let result = checkWinner();
 			if(result==='X' || result ==='O'){
 				disable_cell();
-				console.log("winner ", players[p_loop].getName());
+				DisplayController.updateStatus('Winner is:', players[p_loop].getName());
 			}
 			else if(result === 'tie'){
 				disable_cell();
-				console.log("tied");	
+				DisplayController.updateStatus('Tied');
 			}
 			else{
 				nextTurn();
@@ -257,6 +244,7 @@ const GameControl = (()=>{
 			node.removeEventListener(type, func, false);
 		});*/
 
+		//css class pointer-event: none to prevent clicking
 		gamecells.forEach(node =>{
 			node.classList.add('disable-div');
 		});
@@ -275,11 +263,9 @@ const GameControl = (()=>{
 			let win = gameboard[e[0]] + gameboard[e[1]] +gameboard[e[2]];
 
 			if(win === 'XXX'){
-			
 				return 'X';
 			}
 			else if(win ==='OOO'){
-			
 				return 'O';
 			}
 			
@@ -287,7 +273,7 @@ const GameControl = (()=>{
 		let avail = gameboard.filter(val =>{
 			return val !== '';
 		});
-	//	console.log(avail);
+	
 		//no winner decided, return tied game
 		if(avail.length === 9 && winner == null){
 			winner = 'tie';
@@ -299,7 +285,7 @@ const GameControl = (()=>{
 
 	}
 
-	return { init , gameboard }
+	return { init }
 })();
 
 
